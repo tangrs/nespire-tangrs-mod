@@ -10,6 +10,8 @@ _start:
 	sub	sp, sp, #s_SIZE
 	bic	sp, sp, #s_ALIGN - 1
 	mov	r9, sp
+	sub	sp, sp, #s_SIZE // Reserve space for state
+	
 	mov	r0, #0
 	mov	r2, #s_SIZE
 1:	subs	r2, r2, #4
@@ -174,9 +176,9 @@ pause_loop:
 	str	r4, [r9, #s_command_keys_pressed]
 	bic	r5, r4, r5
 
-//	tst	r5, #1 << 0;	movne	r10, #1
+	tst	r5, #1 << 0;	blne save_state
 //	tst	r5, #1 << 1;	movne	r10, #2
-//	tst	r5, #1 << 2;	movne	r10, #3
+	tst	r5, #1 << 2;	blne load_state
 //	tst	r5, #1 << 3;	movne	r10, #4
 //	tst	r5, #1 << 4;	movne	r10, #5
 //	tst	r5, #1 << 5;	movne	r10, #6
@@ -295,5 +297,61 @@ touchpad_update_input:
 	tst	r0, #1 << 25;	orrne	r2, r2, #0x04	@ Del (Select)
 	str	r2, [r9, #s_input_status]
 	pop {r4, pc}
+
+save_state:
+    str lr, saved_state_cpu_status+56
+    adr lr, saved_state_cpu_status
+    stm lr, {r0-r13}
+    mrs r0, cpsr
+    str r0, saved_state_cpu_cpsr
+    
+    mov r1, #s_SIZE
+    sub r2, r9, #s_SIZE
+    mov r3, r9
+    sstate_loop:
+    ldr r0, [r3]
+    str r0, [r2]
+    add r3, r3, #4
+    add r2, r2, #4
+    sub r1, r1, #4
+    cmp r1, #0
+    bne sstate_loop
+    
+    mov r0, #1
+    str r0, save_state_exists
+    
+    ldr lr, saved_state_cpu_status+56 // subroutine return
+
+load_state:
+    ldr r0, save_state_exists
+    cmp r0, #0
+    moveq pc,lr
+
+    mov r1, #s_SIZE
+    sub r3, r9, #s_SIZE
+    mov r2, r9
+    lstate_loop:
+    ldr r0, [r3]
+    str r0, [r2]
+    add r3, r3, #4
+    add r2, r2, #4
+    sub r1, r1, #4
+    cmp r1, #0
+    bne lstate_loop
+    
+    ldr r0, saved_state_cpu_cpsr
+    msr cpsr_all, r0
+    adr lr, saved_state_cpu_status
+    ldm lr, {r0-r13,pc} // returns to previous instruction after save_state
+
+
+save_state_exists: .word 0
+
+saved_state_cpu_status:
+    .rept 15
+    .word 0
+    .endr
+saved_state_cpu_cpsr:
+    .word 0
 
 	.pool

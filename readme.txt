@@ -1,16 +1,21 @@
-NESpire v0.21 - With Tangrs' Keymap Mod
+NESpire v0.21 - tangrs mod
 
 [ About ]
 
 NESpire is an emulator that allows you to play Nintendo Entertainment
 System (NES) games on the TI-Nspire or TI-Nspire CAS.
 
-This version was modded to have different controls on the Touchpad.
-It was modded so the controls are similar to gbc4nspire which, arguably, 
-is more ergonomical than using a touchpad.
+This mod adds some modifications and extra features. Some extra features
+found in this mod include:
+
+*   Different controls on the Touchpad.
+    It was modded so the controls are similar to gbc4nspire which, are 
+     arguably, more ergonomical than using the touchpad.
+*   Ability to save and load states
 
 Original source: http://www.ticalc.org/archives/files/fileinfo/432/43217.html
 Original author: Korath_3 (korath3@gmail.com)
+Mod by: tangrs (dt.tangr@gmail.com)
 
 [ Using NESpire ]
 
@@ -55,6 +60,8 @@ Game controls (Touchpad):
 Emulator controls:
     (frameskip controls removed in this build since it conflicts with
      touchpad controls)
+    1   = Save state
+    3   = Load state
     *   = Fast-forward
     B   = Reverse border color
     P   = Pause (Many NES games have their own pause feature, but it will
